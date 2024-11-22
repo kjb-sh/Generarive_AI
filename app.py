@@ -1,39 +1,33 @@
-import openai
-import requests
-from io import BytesIO
-from PIL import Image
+from dotenv import load_dotenv 
+load_dotenv() 
 
-# Set your OpenAI API key here
-openai.api_key = 'AIzaSyBRdlTpn7AKEwEg8ZPWziryPZHzS9Kdwpo'
+import streamlit as st 
+import os 
+import google.generativeai as genai 
+# Correct usage of set_page_config with 'page_title' argument
+st.set_page_config(page_title='GEN AI GENERATOR', layout='wide')
 
-# Function to generate an image from a prompt
-def generate_image_from_prompt(prompt, size="1024x1024"):
-    try:
-        # Call the OpenAI API to generate the image from the prompt
-        response = openai.Image.create(
-            prompt=prompt,
-            n=1,  # Number of images to generate
-            size=size  # Image size (1024x1024, 1024x1792, 1792x1024)
-        )
-        
-        # Extract the URL of the generated image
-        image_url = response['data'][0]['url']
-        
-        # Download the image
-        image_response = requests.get(image_url)
-        image = Image.open(BytesIO(image_response.content))
-        
-        # Show the image
-        image.show()
-        
-        # Optionally, save the image to a file
-        image.save("generated_image.png")
-        
-        print(f"Image generated and saved as 'generated_image.png'.")
-        
-    except Exception as e:
-        print(f"An error occurred: {e}")
+# Add your app content below
+st.title('Welcome to GEN AI GENERATOR!')
+st.write("This is a simple AI generation app.")
 
-# Example prompt
-prompt = "A futuristic city skyline with flying cars and neon lights at night."
-generate_image_from_prompt(prompt)
+genai.configure(api_key="AIzaSyBRdlTpn7AKEwEg8ZPWziryPZHzS9Kdwpo")
+
+# model = genai.GenerativeModel("gemini-flash-1.5") 
+model = genai.GenerativeModel("gemini-pro") 
+
+def my_output(query):
+    response = model.generate_content(query) 
+    return response.text 
+
+#### UI Development using streamlit 
+
+
+st.header("SMART_BOT") 
+input = st.text_input("Input " , key = "input")  
+submit = st.button("Ask your query") 
+
+if submit :
+    response = my_output(input) 
+    st.subheader("The Response is=")
+    st.write(response)
